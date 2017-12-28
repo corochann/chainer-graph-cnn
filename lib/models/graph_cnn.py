@@ -27,21 +27,26 @@ class GraphCNN(chainer.Chain):
         # of graphs into 2 levels by combining pooling indices.
         graphs, pooling_inds = coarsening.combine(graphs, pooling_inds, 2)
 
-        self.graph_layers = []
+        graph_conv_layers_list = []
+
+        # sizes for graph conv layers
+        graph_pool_list = []
         sizes = [32, 64]
         for i, (g, inds, s) in enumerate(zip(graphs, pooling_inds, sizes)):
             f = GraphConvolution(None, s, g, K=25)
-            self.add_link('gconv{}'.format(i), f)
             p = GraphMaxPoolingFunction(inds)
-            self.graph_layers.append((f, p))
+            graph_conv_layers_list.append(f)
+            graph_pool_list.append(p)
 
-        self.linear_layers = []
+        # sizes for linear layers
         sizes = [512]
-        for i, s in enumerate(sizes):
-            f = L.Linear(None, s)
-            self.add_link('l{}'.format(i), f)
-            self.linear_layers.append(f)
-        self.add_link('cls_layer', L.Linear(None, n_out))
+        with self.init_scope():
+            self.graph_conv_layers = chainer.ChainList(
+                *graph_conv_layers_list)
+            self.linear_layers = chainer.ChainList(
+                *[L.Linear(None, s) for s in sizes])
+            self.cls_layer = L.Linear(None, n_out)
+        self.graph_pool_functions = graph_pool_list
 
     def __call__(self, x, *args):
         # x.shape = (n_batch, n_channels, h*w)
@@ -49,7 +54,7 @@ class GraphCNN(chainer.Chain):
 
         h = x
         # Graph convolutional layers
-        for f, p in self.graph_layers:
+        for f, p in zip(self.graph_conv_layers, self.graph_pool_functions):
             h = p(F.relu(f(h)))
 
         # Fully connected layers
