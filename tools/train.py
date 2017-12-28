@@ -16,16 +16,6 @@ from lib import graph
 from lib.models import graph_cnn
 
 
-class TestModeEvaluator(extensions.Evaluator):
-
-    def evaluate(self):
-        model = self.get_target('main')
-        model.train = False
-        ret = super(TestModeEvaluator, self).evaluate()
-        model.train = True
-        return ret
-
-
 def concat_and_reshape(batch, device=None, padding=None):
     x, y = dataset.concat_examples(batch, device, padding)
     return x.reshape(len(x), 1, 784), y
@@ -83,11 +73,11 @@ def main():
 
     # Extentions
     trainer.extend(
-        TestModeEvaluator(val_iter, model, device=devices['main'],
-                          converter=concat_and_reshape),
+        extensions.Evaluator(val_iter, model, device=devices['main'],
+                             converter=concat_and_reshape),
         trigger=(args.val_freq, 'epoch'))
     trainer.extend(
-        extensions.snapshot(trigger=(args.snapshot_freq, 'epoch')))
+        extensions.snapshot(), trigger=(args.snapshot_freq, 'epoch'))
     trainer.extend(
         extensions.LogReport(trigger=(args.log_freq, 'epoch')))
     trainer.extend(extensions.PrintReport([

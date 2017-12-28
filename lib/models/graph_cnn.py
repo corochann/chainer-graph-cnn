@@ -43,8 +43,6 @@ class GraphCNN(chainer.Chain):
             self.linear_layers.append(f)
         self.add_link('cls_layer', L.Linear(None, n_out))
 
-        self.train = True
-
     def __call__(self, x, *args):
         # x.shape = (n_batch, n_channels, h*w)
         dropout_ratio = 0.5
@@ -56,7 +54,7 @@ class GraphCNN(chainer.Chain):
 
         # Fully connected layers
         for f in self.linear_layers:
-            h = F.relu(F.dropout(f(h), dropout_ratio, train=self.train))
+            h = F.relu(F.dropout(f(h), dropout_ratio))
 
         # Linear classification layer
         h = self.cls_layer(h)
