@@ -81,7 +81,7 @@ class GraphConvolutionFunction(function.Function):
             x_type.shape[1] == w_type.shape[1],
         )
 
-        if n_in.eval() == 3:
+        if type_check.eval(n_in) == 3:
             b_type = in_types[2]
             type_check.expect(
                 b_type.dtype == x_type.dtype,
@@ -93,7 +93,7 @@ class GraphConvolutionFunction(function.Function):
         self.LmI_tuple = tuple(map(cuda.to_cpu, self.LmI_tuple))
 
     def to_gpu(self, device=None):
-        with cuda.get_device(device):
+        with cuda.get_device_from_id(device):
             self.LmI_tuple = tuple(map(cuda.to_gpu, self.LmI_tuple))
 
     def forward_cpu(self, inputs):
@@ -173,7 +173,7 @@ class GraphConvolutionFunction(function.Function):
         b = inputs[2] if len(inputs) == 3 else None
         gy = grad_outputs[0]
         xp = cuda.get_array_module(x)
-        with cuda.get_device(x.data):
+        with cuda.get_device_from_array(x.data):
             n_batch, c_in, N = x.shape
             c_out = gy.shape[1]
 

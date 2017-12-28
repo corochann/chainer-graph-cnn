@@ -74,7 +74,7 @@ class GraphMaxPoolingFunction(function.Function):
         n_batch, c, N = x.shape
         N_coarse = len(self.pooling_inds)
 
-        with cuda.get_device(x.data):
+        with cuda.get_device_from_array(x.data):
             x = x.transpose((2, 1, 0))
             p_dim = self.pooling_inds.shape[1]
             y = xp.empty((N_coarse, c, n_batch), dtype=x.dtype)
@@ -101,7 +101,7 @@ class GraphMaxPoolingFunction(function.Function):
         xp = cuda.get_array_module(x)
         n_batch, c_in, N = x.shape
 
-        with cuda.get_device(x.data):
+        with cuda.get_device_from_array(x.data):
             x = x.transpose((2, 1, 0))
             gy = grad_outputs[0]
             N_coarse = gy.shape[2]
