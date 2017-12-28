@@ -34,13 +34,14 @@ def concat_and_reshape(batch, device=None, padding=None):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', '-c', type=str,
-                        required=True, help='Configuration file')
-    parser.add_argument('--outdir', '-o', type=str,
-                        required=True, help='Output directory')
-    parser.add_argument('--epoch', '-e', type=int,
-                        required=True, help='Number of epochs to train for')
-    parser.add_argument('--gpus', '-g', type=int, nargs="*",
-                        required=True, help='GPU(s) to use for training')
+                        default='../configs/default.json',
+                        help='Configuration file')
+    parser.add_argument('--outdir', '-o', type=str, default='results',
+                        help='Output directory')
+    parser.add_argument('--epoch', '-e', type=int, default=100,
+                        help='Number of epochs to train for')
+    parser.add_argument('--gpus', '-g', type=int, nargs="*", default=-1,
+                        help='GPU(s) to use for training')
     parser.add_argument('--val-freq', type=int, default=1,
                         help='Validation frequency')
     parser.add_argument('--snapshot-freq', type=int,
@@ -61,6 +62,8 @@ def main():
         optimizer.add_hook(chainer.optimizer.WeightDecay(
             config['optimizer']['weight_decay']))
 
+    if isinstance(args.gpus, int):
+        args.gpus = [args.gpus, ]
     devices = {'main': args.gpus[0]}
     for gid in args.gpus[1:]:
         devices['gpu{}'.format(gid)] = gid
