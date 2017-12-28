@@ -5,10 +5,10 @@ import numpy as np
 
 import chainer
 from chainer import cuda
-from chainer.cuda import cupy
 from chainer import function
 
 if chainer.cuda.available:
+    from chainer.cuda import cupy
     # x will be flattened in C-order
     # y will be flattened in C-order
     gpu_graphpool_fwd = cupy.ElementwiseKernel(

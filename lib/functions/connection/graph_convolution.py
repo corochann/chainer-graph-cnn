@@ -7,9 +7,12 @@ import six
 
 import chainer
 from chainer import cuda
-from chainer.cuda import cupy
 from chainer import function
 from chainer.utils import type_check
+try:
+    from chainer.cuda import cupy
+except:
+    pass
 
 
 def chebyshev_matvec_cpu(C, x, K, n_batch, LmI):
