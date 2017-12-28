@@ -9,10 +9,6 @@ import chainer
 from chainer import cuda
 from chainer import function
 from chainer.utils import type_check
-try:
-    from chainer.cuda import cupy
-except:
-    pass
 
 
 def chebyshev_matvec_cpu(C, x, K, n_batch, LmI):
@@ -28,6 +24,7 @@ def chebyshev_matvec_cpu(C, x, K, n_batch, LmI):
 
 
 if chainer.cuda.available:
+    from chainer.cuda import cupy
     # Computes y = Lx
     # x will be flattened in C-order
     # y will be flattened in C-order
