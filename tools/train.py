@@ -28,7 +28,7 @@ def main():
                         help='Configuration file')
     parser.add_argument('--outdir', '-o', type=str, default='results',
                         help='Output directory')
-    parser.add_argument('--epoch', '-e', type=int, default=100,
+    parser.add_argument('--epoch', '-e', type=int, default=20,
                         help='Number of epochs to train for')
     parser.add_argument('--gpus', '-g', type=int, nargs="*", default=-1,
                         help='GPU(s) to use for training')
